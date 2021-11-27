@@ -61,7 +61,7 @@ UART_HandleTypeDef huart2;
 osThreadId defaultTaskHandle;
 
 /* USER CODE BEGIN PV */
-int flag = 0;
+int flag = 0; // flag is the BTN in the vehicle and used to indicate when the light is to be switched on
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE END PV */
