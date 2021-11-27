@@ -1,0 +1,3 @@
+1. Ambulance: Tracked using a GPS module and coordinates are communicated to the webserver using GSM module.
+2. Asynchronous Web Server: Sends signal to microcontroller specifying change to occur. Uses ESP-32 on Arduino IDE and GSM/GPRS module.
+3. Traffic Light: Responsible for the timely response to the signal provided by the webserver. Uses STM32, GPS and GSM/GPRS module.
