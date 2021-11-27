@@ -30,7 +30,7 @@
   * 5. Redistribution and use of this software other than as permitted under 
   *    this license is void and will automatically terminate your rights under 
   *    this license. 
-  *
+   
   * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS" 
   * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT 
   * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
