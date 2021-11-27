@@ -186,7 +186,7 @@ int main(void)
 
 //		if(flag && HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11)==0) // wala lazem f variable el awal?
 //		{
-//			// if not green light
+//			// if not green light, we turn yellow light on first and then green light
 //			// yellow light on
 //			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
 //			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
@@ -202,7 +202,7 @@ int main(void)
 //		
 //		if(flag && HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11)==1) // if green is already on
 //		{
-//			// green light on
+//			// we turn green light on for a longer amount of time
 //			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
 //			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
 //			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
