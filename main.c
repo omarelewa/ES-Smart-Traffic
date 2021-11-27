@@ -61,7 +61,7 @@ UART_HandleTypeDef huart2;
 osThreadId defaultTaskHandle;
 
 /* USER CODE BEGIN PV */
-int flag = 0;
+int flag = 0; // flag is the BTN in the vehicle and used to indicate when the light is to be switched on
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE END PV */
@@ -150,7 +150,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		// set gpio pins pa11, pb4, pb5 to 0 accordingly
+		// configuration of gpio pins pa11, pb4, pb5 to 0 accordingly, performed through STMCubeMX
 		// pa11 green, pb4 yellow, pb5 red
 		// green light on
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
@@ -186,7 +186,7 @@ int main(void)
 
 //		if(flag && HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11)==0) // wala lazem f variable el awal?
 //		{
-//			// if not green light
+//			// if not green light, we turn yellow light on first and then green light
 //			// yellow light on
 //			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
 //			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
@@ -202,7 +202,7 @@ int main(void)
 //		
 //		if(flag && HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11)==1) // if green is already on
 //		{
-//			// green light on
+//			// we turn green light on for a longer amount of time
 //			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
 //			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
 //			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
