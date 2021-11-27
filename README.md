@@ -95,7 +95,7 @@ Many emergencies/services can easily get delayed during rush hours, and while so
 - GSM/GPRS: A6 Quad band
 - ESP32
 - 3 Vodafone SIM Cards (for communication within the network)
-- GPS: Ublox NEO 6m SKU 165
+- GPS: Ublox NEO 6m SKU 165 [GPS](https://github.com/omarelewa/ES-Smart-Traffic/tree/master)
 - 3 LEDs (green, yellow and red, one for each traffic light)
 
 ## Software Components
