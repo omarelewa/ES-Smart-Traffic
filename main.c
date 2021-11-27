@@ -150,7 +150,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		// set gpio pins pa11, pb4, pb5 to 0 accordingly
+		// configuration of gpio pins pa11, pb4, pb5 to 0 accordingly, performed through STMCubeMX
 		// pa11 green, pb4 yellow, pb5 red
 		// green light on
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
