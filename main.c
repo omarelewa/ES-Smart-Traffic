@@ -35,6 +35,12 @@
 #define GREEN_ON_TIME 	3000
 #define YELLOW_ON_TIME 	1000
 #define RED_ON_TIME 	3000
+#define AT_BUFFER 		20
+#define AT_CMGF_BUFFER 	20
+#define AT_CNMI_BUFFER	30
+#define OK_BUFFER		200
+#define MESSAGE_BUFFER	200
+#define TRANSMIT_DELAY	3000
 #define LEDS_DELAY		3000
 //#define PREF_SMS_STORAGE "\"SM\""
 /* USER CODE END PD */
@@ -49,6 +55,20 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+char AT[AT_BUFFER];
+//int		AT;
+char AT_CMGF[AT_CMGF_BUFFER];
+//int 	AT_CMGF;
+char AT_CNMI[AT_CNMI_BUFFER];
+//int 	AT_CNMI;
+uint8_t ATisOK = 1;
+//uint8_t slot = 0;
+uint8_t OK_AT[OK_BUFFER] = { 0 };
+uint8_t OK_AT_CMGF[OK_BUFFER] = { 0 };
+uint8_t message_1[MESSAGE_BUFFER] = { 0 };
+uint8_t message_2[MESSAGE_BUFFER] = { 0 };
+//uint8_t rx_index = 0;
+//uint8_t rx_data;
 int rounds = 0;
 int parser = 0;
 int mode = 0;
@@ -86,6 +106,34 @@ void traffic_lights_on(int rounds) {
 		break;
 	}
 	//rounds++;
+}
+
+void AT_SEND_RECEIVE(char AT[AT_BUFFER], UART_HandleTypeDef *huart1,
+		uint8_t OK[OK_BUFFER]) {
+	snprintf(AT, AT_BUFFER, "AT\r\n");
+	HAL_UART_Transmit(&*huart1, (uint8_t*) AT, AT_BUFFER, TRANSMIT_DELAY);
+	HAL_Delay(TRANSMIT_DELAY);
+	HAL_UART_Receive_IT(&*huart1, OK, OK_BUFFER);
+}
+
+void AT_CMGF_SEND_RECEIVE(char AT_CMGF[AT_CMGF_BUFFER],
+		UART_HandleTypeDef *huart1, uint8_t OK_AT_CMGF[OK_BUFFER]) {
+	snprintf(AT_CMGF, AT_CMGF_BUFFER, "AT+CMGF=1\r\n");
+	HAL_UART_Transmit(&*huart1, (uint8_t*) AT_CMGF, AT_CMGF_BUFFER,
+			TRANSMIT_DELAY);
+	HAL_Delay(2 * TRANSMIT_DELAY);
+	HAL_UART_Receive_IT(&*huart1, OK_AT_CMGF, OK_BUFFER);
+}
+
+void AT_CNMI_SEND_RECEIVE(char AT_CNMI[AT_CNMI_BUFFER],
+		UART_HandleTypeDef *huart1, uint8_t message_1[MESSAGE_BUFFER],
+		uint8_t message_2[MESSAGE_BUFFER]) {
+	snprintf(AT_CNMI, AT_CNMI_BUFFER, "AT+CNMI=2,2,0,0,0\r\n");
+	HAL_UART_Transmit(&*huart1, (uint8_t*) AT_CNMI, MESSAGE_BUFFER,
+			TRANSMIT_DELAY);
+	HAL_Delay(2 * TRANSMIT_DELAY);
+	HAL_UART_Receive_IT(&*huart1, message_1, MESSAGE_BUFFER);
+	HAL_UART_Receive_IT(&*huart1, message_2, MESSAGE_BUFFER);
 }
 
 void LEDS_ON() {
@@ -129,7 +177,9 @@ int main(void) {
 	MX_USART1_UART_Init();
 	MX_USART2_UART_Init();
 	/* USER CODE BEGIN 2 */
-
+	AT_SEND_RECEIVE(AT, &huart1, OK_AT);
+	AT_CMGF_SEND_RECEIVE(AT_CMGF, &huart1, MESSAGE_BUFFER);
+	AT_CNMI_SEND_RECEIVE(AT_CNMI, &huart1, message_1, message_2);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -291,7 +341,28 @@ static void MX_GPIO_Init(void) {
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+//	HAL_UART_Transmit(&huart1, UART1_rxBuffer, 12, 100);
+//	HAL_UART_Receive_IT(&huart1, UART1_rxBuffer, 12);
+	switch (parser) {
+	case 0:
+		if (strstr((char*) OK_AT, "OK") != NULL) {
+			LEDS_ON();
+			parser++;
+		}
+		break;
+	case 1:
+		if (strstr((char*) OK_AT, "OK") != NULL) {
+			LEDS_OFF();
+			parser++;
+		}
+		break;
+	case 2:
+	default:
+		break;
 
+	}
+}
 /* USER CODE END 4 */
 
 /**
@@ -323,3 +394,4 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
