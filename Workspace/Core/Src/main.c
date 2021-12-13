@@ -54,10 +54,10 @@
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
+/* Definitions for Normal_Traffic */
+osThreadId_t Normal_TrafficHandle;
+const osThreadAttr_t Normal_Traffic_attributes = {
+  .name = "Normal_Traffic",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -68,10 +68,10 @@ const osThreadAttr_t TrafficLights_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for myTask03 */
-osThreadId_t myTask03Handle;
-const osThreadAttr_t myTask03_attributes = {
-  .name = "myTask03",
+/* Definitions for Override */
+osThreadId_t OverrideHandle;
+const osThreadAttr_t Override_attributes = {
+  .name = "Override",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityHigh6,
 };
@@ -92,7 +92,7 @@ uint8_t message_2[MESSAGE_BUFFER] = { 0 };
 //uint8_t rx_data;
 int rounds = 0;
 int parser = 0;
-int mode = 0;
+int mode = 1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -176,6 +176,13 @@ void LEDS_OFF()
 	HAL_Delay(3000);
 }
 
+void GREEN_WAVE(int time)
+{
+	HAL_GPIO_WritePin(GPIOB, Red_Pin | Yellow_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB, Green_Pin, GPIO_PIN_SET);
+	HAL_Delay(time);
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -232,14 +239,14 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  /* creation of Normal_Traffic */
+  Normal_TrafficHandle = osThreadNew(StartDefaultTask, NULL, &Normal_Traffic_attributes);
 
   /* creation of TrafficLights */
   TrafficLightsHandle = osThreadNew(StartTask02, NULL, &TrafficLights_attributes);
 
-  /* creation of myTask03 */
-  myTask03Handle = osThreadNew(Answer, NULL, &myTask03_attributes);
+  /* creation of Override */
+  OverrideHandle = osThreadNew(Answer, NULL, &Override_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -436,14 +443,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	  case 1:
 		  if( OK_AT == "OK")
 		  {
-			  AT_CMGF_SEND_RECEIVE(&huart1);
 			  mode = 2;
 		  }
 	  	break;
 	  case 2:
 		  if( OK_AT_CMGF == "OK")
 		  {
-			  AT_CNMI_SEND_RECEIVE(&huart1);
 			  mode = 3;
 		  }
 		  break;
@@ -451,7 +456,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	  default:
 		  if( message_2 == "pass")
 		  {
-			  AT_CNMI_SEND_RECEIVE(&huart1);
+			  mode = 4;
 		  }
 		  break;
 	  }
@@ -479,7 +484,7 @@ void StartDefaultTask(void *argument)
   {
 	traffic_lights_on(rounds);
 	rounds++;
-	HAL_UART_Transmit(&huart2, "Test ", 6, 200);
+	//HAL_UART_Transmit(&huart2, "Test ", 6, 200);
 	AT_SEND_RECEIVE(&huart1);
 //	HAL_UART_
 
@@ -501,7 +506,25 @@ void StartTask02(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  switch(mode)
+	  	  {
+	  	  case 1:
+	  			  AT_CMGF_SEND_RECEIVE(&huart1);
+	  			  break;
+	  	  case 2:
+	  			  AT_CNMI_SEND_RECEIVE(&huart1);
+	  			  break;
+	  	  case 3:
+	  			  AT_CNMI_SEND_RECEIVE(&huart1);
+	  			  break;
+	  	  case 4:
+	  		  	  GREEN_WAVE(5000);
+	  		  	  break;
+	  	  default:
+	  		  	  break;
+	  	  }
+
+	  osDelay(1);
   }
   /* USER CODE END StartTask02 */
 }
